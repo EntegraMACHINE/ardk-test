@@ -1,3 +1,4 @@
+using System;
 using Niantic.ARDK.AR.Scanning;
 using Niantic.ARDK.Extensions.Scanning;
 using UnityEngine;
@@ -43,21 +44,28 @@ public class Scaner : MonoBehaviour
             OnScanProcessingEvent?.Invoke(false, 0);
     }
 
-    public void StartScanning()
+    public void StartScanningButtonPressed()
     {
-        _isScanning = true;
-        _scanManager.StartScanning();
-        Log(StartScaningText);
+        try
+        {
+            _isScanning = true;
+            _scanManager.StartScanning();
+            Log(StartScaningText);
+        }
+        catch (Exception e)
+        {
+            Log(e.Message);
+        }
     }
 
-    public void StopScannig()
+    public void StopScannigButtonPressed()
     {
         _isScanning = false;
         _scanManager.StopScanning();
         Log(StopScaningText);
     }
 
-    public void Process()
+    public void ProcessButtonPressed()
     {
         IScanner.State state = _scanManager.ScannerState;
         if (state == IScanner.State.ScanCompleted)
@@ -67,13 +75,13 @@ public class Scaner : MonoBehaviour
         }
     }
 
-    public void Cancel()
+    public void CancelButtonPressed()
     {
         _scanManager.CancelProcessing();
         Log(CancelProcessingText);
     }
 
-    public void Save()
+    public void SaveButtonPressed()
     {
         _scanManager.SaveCurrentScan();
         Log(SaveScanText);

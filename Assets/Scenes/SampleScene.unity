@@ -301,9 +301,6 @@ MonoBehaviour:
   _stopVideoRecordingButton: {fileID: 1869383771}
   _startScanningButton: {fileID: 1951437868}
   _stopScanningButton: {fileID: 2102216612}
-  _processButton: {fileID: 674415859}
-  _cancelButton: {fileID: 1474799882}
-  _saveButton: {fileID: 985921629}
   _progressbar: {fileID: 557588399}
   _videoRecorderBackground: {fileID: 1291427518}
   _videoRecorderAspectRatioFitter: {fileID: 1291427517}
@@ -687,7 +684,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 660676523}
-        m_TargetAssemblyTypeName: ScanningExampleManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: Scaner, Assembly-CSharp
         m_MethodName: ProcessButtonPressed
         m_Mode: 1
         m_Arguments:
@@ -890,7 +887,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 660676523}
-        m_TargetAssemblyTypeName: ScanningExampleManager, Assembly-CSharp
+        m_TargetAssemblyTypeName: Scaner, Assembly-CSharp
         m_MethodName: SaveButtonPressed
         m_Mode: 1
         m_Arguments:
@@ -1174,6 +1171,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: ARSceneManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 7315055104982771470, guid: e91d6d15f11cc4ad29bb1a41ae9aa381,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7636423979006713103, guid: e91d6d15f11cc4ad29bb1a41ae9aa381,
         type: 3}
@@ -1660,8 +1662,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 660676523}
-        m_TargetAssemblyTypeName: ScanningExampleManager, Assembly-CSharp
-        m_MethodName: CancelProcessButtonPressed
+        m_TargetAssemblyTypeName: Scaner, Assembly-CSharp
+        m_MethodName: CancelButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1956,7 +1958,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1679224524}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 524323431}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: ToSacnButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1679224524
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2278,7 +2292,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1938031672}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 524323431}
+        m_TargetAssemblyTypeName: MainMenuManager, Assembly-CSharp
+        m_MethodName: ToVideoRecorderButtonPressed
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1938031672
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2401,8 +2427,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 660676523}
-        m_TargetAssemblyTypeName: ScanningExampleManager, Assembly-CSharp
-        m_MethodName: ScanButtonPressed
+        m_TargetAssemblyTypeName: Scaner, Assembly-CSharp
+        m_MethodName: StartScanningButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2610,8 +2636,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 660676523}
-        m_TargetAssemblyTypeName: ScanningExampleManager, Assembly-CSharp
-        m_MethodName: StopButtonPressed
+        m_TargetAssemblyTypeName: Scaner, Assembly-CSharp
+        m_MethodName: StopScannigButtonPressed
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

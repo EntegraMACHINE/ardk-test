@@ -17,9 +17,6 @@ public class MainMenuManager : MonoBehaviour
 
     [SerializeField] private Button _startScanningButton;
     [SerializeField] private Button _stopScanningButton;
-    [SerializeField] private Button _processButton;
-    [SerializeField] private Button _cancelButton;
-    [SerializeField] private Button _saveButton;
     [SerializeField] private Slider _progressbar;
 
     [SerializeField] private RawImage _videoRecorderBackground;
@@ -45,51 +42,27 @@ public class MainMenuManager : MonoBehaviour
     private void OnEnable()
     {
         _videoRecorder.OnRecordMessageEvent += UpdateVideoRecorderLog;
-        _videoRecorder.OnSetAspectRatioFitterEvent += SetVideoRecorderAspectRatioFitter;
-        _videoRecorder.OnSetBackgroundEvent += SetVideoRecorderBackgroung;
+        _videoRecorder.OnCameraEnabledEvent += OnCameraEnabled;
+        _videoRecorder.OnCameraDisabledEvent += OnCameraDisabled;
         _scaner.OnRecordMessagekEvent += UpdateScanerLog;
         _scaner.OnScanProcessingEvent += ShowProcessProgress;
-
-        _toVideoRecorderButton.onClick.AddListener(ToVideoRecorderButtonPressed);
-        _toScanButton.onClick.AddListener(ToSacnButtonPressed);
-
-        _startVideoRecordingButton.onClick.AddListener(_videoRecorder.StartRecording);
-        _stopVideoRecordingButton.onClick.AddListener(_videoRecorder.StopRecording);
-
-        _startScanningButton.onClick.AddListener(_scaner.StartScanning);
-        _stopScanningButton.onClick.AddListener(_scaner.StopScannig);
-        _processButton.onClick.AddListener(_scaner.Process);
-        _cancelButton.onClick.AddListener(_scaner.Cancel);
-        _saveButton.onClick.AddListener(_scaner.Save);
-
-        ToVideoRecorderButtonPressed();
     }
 
     private void OnDisable()
     {
-        _toVideoRecorderButton.onClick.RemoveAllListeners();
-        _toScanButton.onClick.RemoveAllListeners();
-
-        _startScanningButton.onClick.RemoveAllListeners();
-        _stopScanningButton.onClick.RemoveAllListeners();
-
-        _startScanningButton.onClick.RemoveAllListeners();
-        _stopScanningButton.onClick.RemoveAllListeners();
-        _processButton.onClick.RemoveAllListeners();
-        _cancelButton.onClick.RemoveAllListeners();
-        _saveButton.onClick.RemoveAllListeners();
-
         _videoRecorder.OnRecordMessageEvent -= UpdateVideoRecorderLog;
-        _videoRecorder.OnSetAspectRatioFitterEvent -= SetVideoRecorderAspectRatioFitter;
-        _videoRecorder.OnSetBackgroundEvent -= SetVideoRecorderBackgroung;
+        _videoRecorder.OnCameraEnabledEvent -= OnCameraEnabled;
+        _videoRecorder.OnCameraDisabledEvent -= OnCameraDisabled;
         _scaner.OnRecordMessagekEvent -= UpdateScanerLog;
         _scaner.OnScanProcessingEvent -= ShowProcessProgress;
     }
 
-    private void ToSacnButtonPressed()
+    public void ToSacnButtonPressed()
     {
         if (_videoRecorder.IsVideoRecording)
-            _videoRecorder.StopRecording();
+            _videoRecorder.StopRecordingButtonPressed();
+
+        _videoRecorder.DisableCamera();
 
         _videoRecorderUI.SetActive(false);
         _scanerUI.SetActive(true);
@@ -99,8 +72,10 @@ public class MainMenuManager : MonoBehaviour
         _state = AppState.Scan;
     }
 
-    private void ToVideoRecorderButtonPressed()
+    public void ToVideoRecorderButtonPressed()
     {
+        _videoRecorder.EnableCamera();
+
         _scanerUI.SetActive(false);
         _videoRecorderUI.SetActive(true);
         _scaner.gameObject.SetActive(false);
@@ -140,20 +115,22 @@ public class MainMenuManager : MonoBehaviour
         _scanerLog.text = message;
     }
 
-    private void SetVideoRecorderAspectRatioFitter(float width, float height, bool videoVerticallyMirrored, int videoRotationAngle)
+    private void OnCameraEnabled(WebCamTexture texture)
     {
-        float ration = width / height;
+        _videoRecorderBackground.texture = texture;
+
+        float ration = (float)texture.width / (float)texture.height;
         _videoRecorderAspectRatioFitter.aspectRatio = ration;
 
-        float scaleY = videoVerticallyMirrored ? -1f : 1f;
+        float scaleY = texture.videoVerticallyMirrored ? -1f : 1f;
         _videoRecorderBackground.rectTransform.localScale = new Vector3(1f, scaleY, 1f);
 
-        int orient = -videoRotationAngle;
+        int orient = -texture.videoRotationAngle;
         _videoRecorderBackground.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
     }
 
-    private void SetVideoRecorderBackgroung(WebCamTexture texture)
+    private void OnCameraDisabled()
     {
-        _videoRecorderBackground.texture = texture;
+        _videoRecorderBackground.texture = null;
     }
 }

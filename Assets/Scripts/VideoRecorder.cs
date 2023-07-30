@@ -12,11 +12,11 @@ public class VideoRecorder : MonoBehaviour
     public delegate void OnRecordMessage(string message);
     public event OnRecordMessage OnRecordMessageEvent;
 
-    public delegate void OnSetAspectRatioFitter(float width, float height, bool videoVerticallyMirrored, int videoRotationAngle);
-    public event OnSetAspectRatioFitter OnSetAspectRatioFitterEvent;
+    public delegate void OnCameraEnabled(WebCamTexture texture);
+    public event OnCameraEnabled OnCameraEnabledEvent;
 
-    public delegate void OnSetBackground(WebCamTexture texture);
-    public event OnSetBackground OnSetBackgroundEvent;
+    public delegate void OnCameraDisabled();
+    public event OnCameraDisabled OnCameraDisabledEvent;
 
     private WebCamTexture _webCamTexture;
 
@@ -27,15 +27,33 @@ public class VideoRecorder : MonoBehaviour
 
     private void Start()
     {
+        if (InitCamera())
+            EnableCamera();
+    }
+
+    private bool InitCamera()
+    {
         if (_isCameraAvailable = TryGetCameraDevice(out WebCamDevice device))
         {
             _webCamTexture = new WebCamTexture(device.name, Screen.width, Screen.height);
-            _webCamTexture.Play();
-            return;
+            return true;
         }
 
         Log(NoBackCameraDetectedText);
         _isCameraAvailable = false;
+        return false;
+    }
+
+    public void EnableCamera()
+    {
+        _webCamTexture?.Play();
+        OnCameraEnabledEvent?.Invoke(_webCamTexture);
+    }
+
+    public void DisableCamera()
+    {
+        _webCamTexture?.Stop();
+        OnCameraDisabledEvent?.Invoke();
     }
 
     private bool TryGetCameraDevice(out WebCamDevice device)
@@ -47,7 +65,7 @@ public class VideoRecorder : MonoBehaviour
             return false;
 
         for (int i = 0; i < devices.Length; i++)
-            if (devices[i].isFrontFacing)
+            if (!devices[i].isFrontFacing)
             {
                 device = devices[i];
                 return true;
@@ -56,16 +74,7 @@ public class VideoRecorder : MonoBehaviour
         return false;
     }
 
-    private void Update()
-    {
-        if (!_isCameraAvailable)
-            return;
-
-        OnSetBackgroundEvent?.Invoke(_webCamTexture);
-        OnSetAspectRatioFitterEvent?.Invoke((float)_webCamTexture.width, (float)_webCamTexture.height, _webCamTexture.videoVerticallyMirrored, _webCamTexture.videoRotationAngle);
-    }
-
-    public async void StartRecording()
+    public async void StartRecordingButtonPressed()
     {
         _isVideoRecording = true;
         Log(RecodingStartText);
@@ -85,7 +94,7 @@ public class VideoRecorder : MonoBehaviour
                 (result, path) => Log($"Video save result: {result}. Path: {path}."));
     }
 
-    public void StopRecording()
+    public void StopRecordingButtonPressed()
     {
         _isVideoRecording = false;
     }
