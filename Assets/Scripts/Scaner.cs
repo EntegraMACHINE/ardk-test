@@ -1,15 +1,15 @@
-using System;
 using Niantic.ARDK.AR.Scanning;
 using Niantic.ARDK.Extensions.Scanning;
 using UnityEngine;
 
 public class Scaner : MonoBehaviour
 {
-    private const string StartScaningText = "Scan started.";
-    private const string StopScaningText = "Scan stoped.";
+    private const string StartScaningText = "Scaning started.";
+    private const string StopScaningText = "Scaning stoped.";
     private const string StartProcessingText = "Processing started.";
     private const string CancelProcessingText = "Processing stoped.";
     private const string SaveScanText = "Current scan saved.";
+    private const string RestartScanText = "Scan manager restarted.";
 
     public delegate void OnScanProcessing(bool state, float value);
     public event OnScanProcessing OnScanProcessingEvent;
@@ -46,16 +46,9 @@ public class Scaner : MonoBehaviour
 
     public void StartScanningButtonPressed()
     {
-        try
-        {
-            _isScanning = true;
-            _scanManager.StartScanning();
-            Log(StartScaningText);
-        }
-        catch (Exception e)
-        {
-            Log(e.Message);
-        }
+        _isScanning = true;
+        _scanManager.StartScanning();
+        Log(StartScaningText);
     }
 
     public void StopScannigButtonPressed()
@@ -85,6 +78,12 @@ public class Scaner : MonoBehaviour
     {
         _scanManager.SaveCurrentScan();
         Log(SaveScanText);
+    }
+
+    public void RestartButtonPressed()
+    {
+        _scanManager.Restart();
+        Log(RestartScanText);
     }
 
     private void ScanResultHandler(IScanner.ScanProcessedArgs args)

@@ -33,6 +33,11 @@ public class MainMenuManager : MonoBehaviour
 
     private AppState _state;
 
+    private void Start()
+    {
+        Screen.orientation = ScreenOrientation.Portrait;
+    }
+
     private void Update()
     {
         if (_state == AppState.Record) UpdateRecordingUI();
@@ -43,7 +48,6 @@ public class MainMenuManager : MonoBehaviour
     {
         _videoRecorder.OnRecordMessageEvent += UpdateVideoRecorderLog;
         _videoRecorder.OnCameraEnabledEvent += OnCameraEnabled;
-        _videoRecorder.OnCameraDisabledEvent += OnCameraDisabled;
         _scaner.OnRecordMessagekEvent += UpdateScanerLog;
         _scaner.OnScanProcessingEvent += ShowProcessProgress;
     }
@@ -52,7 +56,6 @@ public class MainMenuManager : MonoBehaviour
     {
         _videoRecorder.OnRecordMessageEvent -= UpdateVideoRecorderLog;
         _videoRecorder.OnCameraEnabledEvent -= OnCameraEnabled;
-        _videoRecorder.OnCameraDisabledEvent -= OnCameraDisabled;
         _scaner.OnRecordMessagekEvent -= UpdateScanerLog;
         _scaner.OnScanProcessingEvent -= ShowProcessProgress;
     }
@@ -127,10 +130,5 @@ public class MainMenuManager : MonoBehaviour
 
         int orient = -texture.videoRotationAngle;
         _videoRecorderBackground.rectTransform.localEulerAngles = new Vector3(0, 0, orient);
-    }
-
-    private void OnCameraDisabled()
-    {
-        _videoRecorderBackground.texture = null;
     }
 }

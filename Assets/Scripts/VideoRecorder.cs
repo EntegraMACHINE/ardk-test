@@ -46,12 +46,18 @@ public class VideoRecorder : MonoBehaviour
 
     public void EnableCamera()
     {
+        if (!_isCameraAvailable)
+            return;
+
         _webCamTexture?.Play();
         OnCameraEnabledEvent?.Invoke(_webCamTexture);
     }
 
     public void DisableCamera()
     {
+        if (!_isCameraAvailable)
+            return;
+
         _webCamTexture?.Stop();
         OnCameraDisabledEvent?.Invoke();
     }
