@@ -148,9 +148,21 @@ PlayerSettings:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 11400000, guid: b0ab9818e7e056c42b9fb8509173133b, type: 2}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 11400000, guid: 00db1c85ff47115448586837269aee16, type: 2}
   - {fileID: -7261591836619079132, guid: 10e429820d2cc4e489365ce4b47df7af, type: 2}
-  - {fileID: 11400000, guid: 71d0da01b0d5a904db279863473cab24, type: 2}
+  - {fileID: 11400000, guid: 7eb2d86c190ce034d98fd5f586e01228, type: 2}
   - {fileID: 11400000, guid: 872be69716e558d48a7e0e9055552e61, type: 2}
   metroInputSource: 0
   wsaTransparentSwapchain: 0
@@ -172,6 +184,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.DefaultCompany.ardktest
+    Standalone: com.DefaultCompany.ardk-test
   buildNumber:
     Standalone: 0
     iPhone: 0
@@ -180,7 +193,7 @@ PlayerSettings:
   AndroidBundleVersionCode: 1
   AndroidMinSdkVersion: 24
   AndroidTargetSdkVersion: 0
-  AndroidPreferredInstallLocation: 1
+  AndroidPreferredInstallLocation: 0
   aotOptions: 
   stripEngineCode: 1
   iPhoneStrippingLevel: 0

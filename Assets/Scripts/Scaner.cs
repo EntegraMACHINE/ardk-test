@@ -1,6 +1,13 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Niantic.ARDK.AR.Scanning;
+using Niantic.ARDK.Extensions;
 using Niantic.ARDK.Extensions.Scanning;
+using Niantic.ARDK.LocationService;
+using Niantic.ARDK.VPSCoverage;
 using UnityEngine;
+using LocationInfo = Niantic.ARDK.LocationService.LocationInfo;
+using LocationServiceStatus = Niantic.ARDK.LocationService.LocationServiceStatus;
 
 public class Scaner : MonoBehaviour
 {
@@ -18,20 +25,70 @@ public class Scaner : MonoBehaviour
     public event OnScanMessage OnRecordMessagekEvent;
 
     [SerializeField] private ARScanManager _scanManager;
+    [SerializeField] private ARSessionManager _sessionManager;
     [SerializeField] private PointCloudVisualizer _pointCloudVisualizer;
 
     [SerializeField] private GameObject _scannedObjectPrefab;
     [SerializeField] private Transform _scannedObjectParent;
 
-    private GameObject scannedObject;
+    private GameObject _scannedObject;
+
+    private IScanTargetClient _scanTargetClient;
+    private LocationInfo _locationInfo;
+    private bool _isLocationInfoAvailable = false;
 
     private bool _isScanning = false;
     public bool IsScanning => _isScanning;
 
-    private void Start()
+    private async void Start()
     {
         _scanManager.SetVisualizer(_pointCloudVisualizer);
         _scanManager.ScanProcessed += ScanResultHandler;
+
+        _isLocationInfoAvailable = await GetLocation();
+    }
+
+    private void OnEnable()
+    {
+        _scanManager.Restart();
+    }
+
+    private async Task<bool> GetLocation()
+    {
+        if (!UnityEngine.Android.Permission.HasUserAuthorizedPermission(UnityEngine.Android.Permission.CoarseLocation))
+            UnityEngine.Android.Permission.RequestUserPermission(UnityEngine.Android.Permission.CoarseLocation);
+
+        ILocationService _locationService = LocationServiceFactory.Create(Niantic.ARDK.RuntimeEnvironment.LiveDevice);
+        _locationService.Start();
+
+        int maxWait = 20;
+        while (_locationService.Status == LocationServiceStatus.Initializing && maxWait > 0)
+        {
+            await Task.Delay(1000);
+            maxWait--;
+        }
+
+        if (maxWait < 1)
+        {
+            Log("Get location info timeout.");
+            return false;
+        }
+
+        if (_locationService.Status == LocationServiceStatus.UnknownError ||
+            _locationService.Status == LocationServiceStatus.DeviceAccessError ||
+            _locationService.Status == LocationServiceStatus.PermissionFailure)
+        {
+            Log("Unable to determine device location.");
+            return false;
+        }
+        else
+        {
+            Log($"Location: {_locationService.LastData.Coordinates}.");
+            _locationInfo = _locationService.LastData;
+        }
+
+        _locationService.Stop();
+        return true;
     }
 
     private void Update()
@@ -44,11 +101,25 @@ public class Scaner : MonoBehaviour
             OnScanProcessingEvent?.Invoke(false, 0);
     }
 
-    public void StartScanningButtonPressed()
+    public async void StartScanningButtonPressed()
     {
-        _isScanning = true;
-        _scanManager.StartScanning();
-        Log(StartScaningText);
+        _scanTargetClient = ScanTargetClientFactory.Create(Niantic.ARDK.RuntimeEnvironment.LiveDevice);
+        ScanTargetResponse response = await _scanTargetClient.RequestScanTargetsAsync(_locationInfo.Coordinates, 2000);
+
+        if (response == null)
+        {
+            Log("Scan targets response is null.");
+            return;
+        }
+
+        if (response.status == ResponseStatus.Success)
+        {
+            _scanManager.SetScanTargetId(response.scanTargets[0].scanTargetIdentifier);
+            _scanManager.StartScanning();
+            Log($"{StartScaningText} Location: {response.scanTargets[0].name}");
+            _isScanning = true;
+        }
+        else Log($"Scan targets response status: {response.status.ToString()}");
     }
 
     public void StopScannigButtonPressed()
@@ -78,6 +149,19 @@ public class Scaner : MonoBehaviour
     {
         _scanManager.SaveCurrentScan();
         Log(SaveScanText);
+
+        string currentScanId = _scanManager.GetScanId();
+        SavedScan savedScan = _scanManager.GetSavedScan(currentScanId);
+
+        _scanManager.UploadScan(currentScanId,
+            (float progress) => Log(progress.ToString()),
+            (bool success, string error) =>
+            {
+                if (success)
+                    Log($"Upload {savedScan.GetScanLocationData()?[0].latitude}, {savedScan.GetScanLocationData()?[0].longitude} success.");
+                else
+                    Log(error);
+            });
     }
 
     public void RestartButtonPressed()
@@ -92,16 +176,16 @@ public class Scaner : MonoBehaviour
 
         if (texturedMesh != null)
         {
-            if (scannedObject == null)
+            if (_scannedObject == null)
             {
-                scannedObject = Instantiate(_scannedObjectPrefab, _scannedObjectParent);
+                _scannedObject = Instantiate(_scannedObjectPrefab, _scannedObjectParent);
             }
             Bounds meshBoundary = texturedMesh.mesh.bounds;
-            scannedObject.transform.localPosition = -1 * meshBoundary.center;
-            scannedObject.transform.localScale = Vector3.one / meshBoundary.extents.magnitude;
-            scannedObject.GetComponent<MeshFilter>().sharedMesh = texturedMesh.mesh;
+            _scannedObject.transform.localPosition = -1 * meshBoundary.center;
+            _scannedObject.transform.localScale = Vector3.one / meshBoundary.extents.magnitude;
+            _scannedObject.GetComponent<MeshFilter>().sharedMesh = texturedMesh.mesh;
             if (texturedMesh.texture != null)
-                scannedObject.GetComponent<Renderer>().material.mainTexture = texturedMesh.texture;
+                _scannedObject.GetComponent<Renderer>().material.mainTexture = texturedMesh.texture;
         }
     }
 
