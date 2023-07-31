@@ -294,6 +294,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _videoRecorder: {fileID: 1540706879}
   _scaner: {fileID: 660676523}
+  _arSceneManager: {fileID: 1153113203}
   _videoRecorderUI: {fileID: 1548472222}
   _scanerUI: {fileID: 154779267}
   _toVideoRecorderButton: {fileID: 1938031671}
@@ -1176,7 +1177,7 @@ PrefabInstance:
     - target: {fileID: 7315055104982771470, guid: e91d6d15f11cc4ad29bb1a41ae9aa381,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7636423979006713103, guid: e91d6d15f11cc4ad29bb1a41ae9aa381,
         type: 3}

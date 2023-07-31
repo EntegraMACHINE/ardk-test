@@ -6,6 +6,8 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private VideoRecorder _videoRecorder;
     [SerializeField] private Scaner _scaner;
 
+    [SerializeField] private GameObject _arSceneManager;
+
     [SerializeField] private GameObject _videoRecorderUI;
     [SerializeField] private GameObject _scanerUI;
 
@@ -31,7 +33,7 @@ public class MainMenuManager : MonoBehaviour
         Scan
     }
 
-    private AppState _state;
+    private AppState _state = AppState.Record;
 
     private void Start()
     {
@@ -66,6 +68,7 @@ public class MainMenuManager : MonoBehaviour
             _videoRecorder.StopRecordingButtonPressed();
 
         _videoRecorder.DisableCamera();
+        _arSceneManager.SetActive(true);
 
         _videoRecorderUI.SetActive(false);
         _scanerUI.SetActive(true);
@@ -77,6 +80,7 @@ public class MainMenuManager : MonoBehaviour
 
     public void ToVideoRecorderButtonPressed()
     {
+        _arSceneManager.SetActive(false);
         _videoRecorder.EnableCamera();
 
         _scanerUI.SetActive(false);
